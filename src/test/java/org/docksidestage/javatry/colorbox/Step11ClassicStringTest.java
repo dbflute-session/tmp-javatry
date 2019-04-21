@@ -152,6 +152,24 @@ public class Step11ClassicStringTest extends PlainTestCase {
         for (ColorBox colorBox : colorBoxList) {
             colorList.add(colorBox.getColor().toString().length());
         }
+
+        for (int i = 0 ; i < colorList.size() - 1; i++) {
+            for (int j = i ; j < colorList.size() ; j++) {
+                if (colorList.get(i) > colorList.get(j)) {
+                    continue;
+                } else if (colorList.get(i) < colorList.get(j)) {
+                    saveInt = colorList.get(i);
+                    colorList.get(i) = colorList.get(j);
+                    colorList.get(j) = saveInt;
+                }
+            }
+        }
+
+        for (int i = 0 ; i < colorList.size() ; i++) {
+            if (colorList.get(i) == colorBoxList.get(i).getColor().toString().length()) {
+                System.out.println(colorBoxList.get(i).getClass().toString()); 
+            }
+        }
         
 
     }
