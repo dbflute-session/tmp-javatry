@@ -15,10 +15,12 @@
  */
 package org.docksidestage.javatry.colorbox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.docksidestage.bizfw.colorbox.ColorBox;
 import org.docksidestage.bizfw.colorbox.color.BoxColor;
+import org.docksidestage.bizfw.colorbox.space.BoxSpace;
 import org.docksidestage.javatry.colorbox.base.YourPrivateRoom;
 import org.docksidestage.unit.PlainTestCase;
 
@@ -31,7 +33,7 @@ import org.docksidestage.unit.PlainTestCase;
  * o don't fix the YourPrivateRoom class and color-box classes
  * </pre>
  * @author jflute
- * @author your_name_here
+ * @author ha jaehyoeng
  */
 public class Step11ClassicStringTest extends PlainTestCase {
 
@@ -45,10 +47,17 @@ public class Step11ClassicStringTest extends PlainTestCase {
     public void test_length_basic() {
         List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
         ColorBox colorBox = colorBoxList.get(0);
-        BoxColor boxColor = colorBox.getColor();
-        String colorName = boxColor.getColorName();
+        BoxColor color = colorBox.getColor();
+        String colorName = color.getColorName();
         int answer = colorName.length();
-        log(answer, colorName); // also show name for visual check
+        log(answer, colorName);
+
+//        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+//        ColorBox colorBox = colorBoxList.get(0);
+//        BoxColor boxColor = colorBox.getColor();
+//        String colorName = boxColor.getColorName();
+//        int answer = colorName.length();
+//        log(answer, colorName); // also show name for visual check
     }
 
     /**
@@ -56,6 +65,23 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる文字列の中で、一番長い文字列は？)
      */
     public void test_length_findMax() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String maxStr = null;
+
+        for (ColorBox colorBox : colorBoxList) {
+            List<BoxSpace> spaceList = colorBox.getSpaceList();
+            for (BoxSpace space : spaceList) {
+                Object content = space.getContent();
+                if (content instanceof String) {
+                    int currentLength = ((String) content).length();
+                    String strContent = (String)content;
+                    if (maxStr == null || maxStr.length() < currentLength) {
+                        maxStr = strContent;
+                    }
+                }
+            }
+        }
+        log(maxStr != null ? maxStr : "*Not found string content");
     }
 
     /**
@@ -63,6 +89,26 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる文字列の中で、一番長いものと短いものの差は何文字？)
      */
     public void test_length_findMaxMinDiff() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String maxStr = null;
+        String minStr = null;
+
+        for (ColorBox colorBox : colorBoxList) {
+            List<BoxSpace> spaceList = colorBox.getSpaceList();
+            for (BoxSpace space : spaceList) {
+                Object content = space.getContent();
+                if (content instanceof String) {
+                    int currentLength = ((String) content).length();
+                    String strContent = (String)content;
+                    if (maxStr == null || maxStr.length() < currentLength) {
+                        maxStr = strContent;
+                    }else if (minStr == null || minStr.length() > currentLength) {
+                        minStr = strContent;
+                    }
+                }
+            }
+        }
+        log(maxStr != null ? maxStr.length()-minStr.length() : "*Not found string content");
     }
 
     /**
@@ -70,6 +116,7 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる値 (文字列以外はtoString()) の中で、二番目に長い文字列は？ (ソートなしで))
      */
     public void test_length_findSecondMax() {
+
     }
 
     /**
@@ -77,6 +124,25 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる文字列の長さの合計は？)
      */
     public void test_length_calculateLengthSum() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        ArrayList<Integer> intArr = new ArrayList();         // 문자열을 저장할 배열
+        int sum = 0;
+
+        for (ColorBox colorBox : colorBoxList) {
+            List<BoxSpace> spaceList = colorBox.getSpaceList();
+            for (BoxSpace space : spaceList) {
+                Object content = space.getContent();        // 뭐가 들어올지 모르니깐 일단 오브젝트로 때려넣는 모습
+                if (content instanceof String) {            // 그 중에 자료형이 문자열인것을 고른다.
+                    intArr.add(((String) content).length());// 문자열의 길이를 배열에 저장한다.
+                }
+            }
+        }
+
+        for (Integer integer : intArr) {
+            sum += integer;                                 // 그 숫자들을 다 더해 넣는다.
+        }
+
+        System.out.println(sum);
     }
 
     /**
@@ -84,6 +150,31 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスの中で、色の名前が一番長いものは？)
      */
     public void test_length_findMaxColorSize() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        ArrayList<Integer> colorList = new ArrayList<>();
+        int saveInt = 0;
+
+        for (ColorBox colorBox : colorBoxList) {
+            colorList.add(colorBox.getColor().getColorName().length());
+        }
+
+        for (int i = 0 ; i < colorList.size() - 1; i++) {
+            for (int j = i ; j < colorList.size() ; j++) {
+                if (colorList.get(i) > colorList.get(j)) {
+                    continue;
+                } else if (colorList.get(i) < colorList.get(j)) {
+                    saveInt = colorList.get(i);
+                    colorList.set(i, colorList.get(j));
+                    colorList.set(j, saveInt);
+                }
+            }
+        }
+
+        for (int i = 0 ; i < colorList.size() ; i++) {
+            if (colorList.get(0) == colorBoxList.get(i).getColor().getColorName().length()) {
+                System.out.println(colorBoxList.get(i).getColor().getColorName());
+            }
+        }
     }
 
     // ===================================================================================
@@ -94,6 +185,16 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * ("Water" で始まる文字列をしまっているカラーボックスの色は？)
      */
     public void test_startsWith_findFirstWord() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "Water";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if(boxSpace.toString().length() >= str.length()
+                        && boxSpace.toString().substring(0, str.length()).equals(str)) {
+                    System.out.println(colorBox.getColor().getColorName());
+                }
+            }
+        }
     }
 
     /**
@@ -101,6 +202,16 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * ("front" で終わる文字列をしまっているカラーボックスの色は？)
      */
     public void test_endsWith_findLastWord() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "front";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if(boxSpace.toString().length() >= str.length()
+                        && boxSpace.toString().substring(boxSpace.toString().length()-5, boxSpace.toString().length()).equals(str)) {
+                    System.out.println(colorBox.getColor().getColorName());
+                }
+            }
+        }
     }
 
     // ===================================================================================
@@ -111,6 +222,16 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる "front" で終わる文字列で、最初の "front" は何文字目から始まる？)
      */
     public void test_indexOf_findIndex() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "front";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if(boxSpace.toString().length() >= str.length()
+                        && boxSpace.toString().substring(boxSpace.toString().length()-5, boxSpace.toString().length()).equals(str)) {
+                    System.out.println(boxSpace.toString().length()-4);
+                }
+            }
+        }
     }
 
     /**
@@ -118,6 +239,25 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる「ど」を二つ以上含む文字列で、最後の「ど」は何文字目から始まる？ (e.g. "どんどん" => 3))
      */
     public void test_lastIndexOf_findIndex() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "ど";
+        int countDo = 0;
+        int saveIndex = 0;
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if (boxSpace.toString().contains(str)){
+                     for (int i = 0 ; i < boxSpace.toString().length() ; i++) {
+                         if (boxSpace.toString().substring(i, i+1).equals(str)) {
+                             countDo++;
+                             saveIndex = i+1;
+                         }
+                     }
+                     if (countDo >= 2) {
+                         System.out.println(saveIndex);
+                     }
+                }
+            }
+        }
     }
 
     // ===================================================================================
@@ -128,6 +268,16 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる "front" で終わる文字列の最初の一文字は？)
      */
     public void test_substring_findFirstChar() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "front";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if(boxSpace.toString().length() >= str.length()
+                        && boxSpace.toString().substring(boxSpace.toString().length()-5, boxSpace.toString().length()).equals(str)) {
+                    System.out.println(boxSpace.toString().charAt(boxSpace.toString().length()-1));
+                }
+            }
+        }
     }
 
     /**
@@ -135,6 +285,16 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる "Water" で始まる文字列の最後の一文字は？)
      */
     public void test_substring_findLastChar() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String str = "Water";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if(boxSpace.toString().length() >= str.length()
+                        && boxSpace.toString().substring(0, str.length()).equals(str)) {
+                    System.out.println(boxSpace.toString().charAt(boxSpace.toString().length()-1));
+                }
+            }
+        }
     }
 
     // ===================================================================================
@@ -145,6 +305,15 @@ public class Step11ClassicStringTest extends PlainTestCase {
      * (カラーボックスに入ってる "o" (おー) を含んだ文字列から "o" を全て除去したら何文字？)
      */
     public void test_replace_remove_o() {
+        List<ColorBox> colorBoxList = new YourPrivateRoom().getColorBoxList();
+        String saveStr = "";
+        for (ColorBox colorBox : colorBoxList) {
+            for (BoxSpace boxSpace : colorBox.getSpaceList()) {
+                if (boxSpace.toString().contains("o")){
+                    saveStr = boxSpace.toString();
+                }
+            }
+        }
     }
 
     /**
